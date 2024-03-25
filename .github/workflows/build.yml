@@ -20,12 +20,18 @@ jobs:
         fetch-depth: 0 # Fetches all history for all branches and tags
         persist-credentials: true # Persists access tokens so the workflow can access the repository
 
+    # Change to the resume directory before running the LaTeX action
+    - name: Change to resume directory
+      run: cd resume
+
     # Step 2: Compile the LaTeX document to PDF
     - name: Compile LaTeX document
       uses: xu-cheng/latex-action@v3 # Uses the LaTeX Action to compile the document
       with:
         root_file: resume/jaman-uddin.tex # Specifies the main LaTeX file to compile
-        working_directory: resume # Set the working directory to the 'resume' folder
+        # working_directory: resume # Set the working directory to the 'resume' folder
+        # The LaTeX action does not have a working_directory input. The directory context needs to be set before this step if needed
+        # Ensure the current directory is correct or adjust the path to root_file as needed
 
     # Step 3: Commit the compiled PDF back to the repository
     - name: Commit compiled PDF
