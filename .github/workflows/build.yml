@@ -25,6 +25,7 @@ jobs:
       uses: xu-cheng/latex-action@v3 # Uses the LaTeX Action to compile the document
       with:
         root_file: resume/jaman-uddin.tex # Specifies the main LaTeX file to compile
+        working_directory: resume # Set the working directory to the 'resume' folder
 
     # Step 3: Commit the compiled PDF back to the repository
     - name: Commit compiled PDF
