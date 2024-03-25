@@ -23,11 +23,17 @@ jobs:
     #   run: cd resume
 
     # Step 2: Compile the LaTeX document to PDF
-    - name: Compile jaman-uddin.tex
-      uses: dante-ev/latex-action@edge
-      with:
-          # Specify the path from the root of the repository to the .tex file
-          root_file: resume/jaman-uddin.tex
+    - name: Install LaTeX
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y aptitude
+          sudo aptiude update
+          sudo aptitude install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+
+    - name: Compile LaTeX document
+      run: |
+          cd resume
+          pdflatex jaman-uddin.tex
 
     # Step 3: Commit the compiled PDF back to the repository
     - name: Commit compiled PDF
