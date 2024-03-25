@@ -34,24 +34,24 @@ jobs:
       run: |
           cd resume
           pdflatex jaman-uddin.tex
+    
+    # Step 3: Convert the PDF to a high-quality image
+    - name: Install Poppler (pdftoppm)
+      run: |
+          sudo aptitude update
+          sudo aptitude install -y poppler-utils
+
+    - name: Convert PDF to PNG
+      run: |
+          pdftoppm resume/jaman-uddin.pdf resume/jaman-uddin -png -r 300
+          mv resume/jaman-uddin-1.png resume/jaman-uddin.png      
 
     # Step 3: Commit the compiled PDF back to the repository
-    - name: Commit compiled PDF
+    - name: Commit compiled PDF and PNG
       uses: stefanzweifel/git-auto-commit-action@v5  # Uses the Git Auto-Commit Action to commit changes
       with:
-        commit_message: "Automatically update compiled resume PDF" # The commit message
-        file_pattern: resume/jaman-uddin.pdf # The path to the compiled PDF to commit
+        commit_message: "Automatically update compiled resume PDF and PNG" # The commit message
+        file_pattern: resume/jaman-uddin.pdf resume/jaman-uddin.png # The path to the compiled PDF and generated PNG to commit
         branch: main # The branch to commit to
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # Optional Step 4: Create a Pull Request for the updated resume
-    # - name: Create Pull Request for updated resume
-    #   uses: peter-evans/create-pull-request@v3 # Uses the Create Pull Request Action
-    #   with:
-    #     commit-message: "Update compiled resume PDF" # The commit message for the PR branch
-    #     title: "Update Compiled Resume PDF" # The title of the Pull Request
-    #     body: "This pull request is auto-generated to update the compiled resume PDF." # The body of the Pull Request
-    #     branch: "update-compiled-resume-${{ github.run_number }}" # The name of the branch for the Pull Request
-    #     delete-branch: true # Deletes the branch after the Pull Request is merged
-    #     labels: "update,resume,automated-pr" # Labels to assign to the Pull Request
