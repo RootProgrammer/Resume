@@ -44,7 +44,7 @@ jobs:
     - name: Convert PDF to PNG
       run: |
           pdftoppm resume/jaman-uddin.pdf resume/jaman-uddin -png -r 300
-          mv resume/jaman-uddin-1.png resume/jaman-uddin.png      
+          mv resume/jaman-uddin.png resume/jaman-uddin.png      
 
     # Step 3: Commit the compiled PDF back to the repository
     - name: Commit compiled PDF and PNG
