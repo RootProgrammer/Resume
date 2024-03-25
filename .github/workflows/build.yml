@@ -43,7 +43,7 @@ jobs:
         file_pattern: resume/jaman-uddin.pdf # The path to the compiled PDF to commit
         branch: main # The branch to commit to
       env:
-        GITHUB_TOKEN: ${{ secrets.ZAMAAN_PERSONAL_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # Optional Step 4: Create a Pull Request for the updated resume
     # - name: Create Pull Request for updated resume
