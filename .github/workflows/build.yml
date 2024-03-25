@@ -42,7 +42,8 @@ jobs:
         commit_message: "Automatically update compiled resume PDF" # The commit message
         file_pattern: resume/jaman-uddin.pdf # The path to the compiled PDF to commit
         branch: main # The branch to commit to
-        github_token: ${{ secrets.ZAMAAN_PERSONAL_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.ZAMAAN_PERSONAL_TOKEN }}
 
     # Optional Step 4: Create a Pull Request for the updated resume
     # - name: Create Pull Request for updated resume
