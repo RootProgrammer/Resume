@@ -1,23 +1,48 @@
-name: Compile LaTeX Resume
+name: Compile and Update LaTeX Resume
 
+# Trigger the workflow on push events to the 'resume/**' directory, on a schedule, and manually through workflow_dispatch
 on:
   push:
     paths:
       - 'resume/**'
+  schedule:
+    - cron: '0 2 * * 1-5' # Runs at 02:00 on every day-of-week from Monday through Friday
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  compile-and-deploy:
+    runs-on: ubuntu-latest # Specifies the runner environment
 
     steps:
+    # Step 1: Checkout the repository
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Fetches all history for all branches and tags
+        persist-credentials: true # Persists access tokens so the workflow can access the repository
+
+    # Step 2: Compile the LaTeX document to PDF
     - name: Compile LaTeX document
-      uses: xu-cheng/latex-action@v3
+      uses: xu-cheng/latex-action@v3 # Uses the LaTeX Action to compile the document
       with:
-        root_file: resume/jaman-uddin.tex
-        
-    - name: Upload PDF
-      uses: actions/upload-artifact@v4
+        root_file: resume/jaman-uddin.tex # Specifies the main LaTeX file to compile
+
+    # Step 3: Commit the compiled PDF back to the repository
+    - name: Commit compiled PDF
+      uses: stefanzweifel/git-auto-commit-action@v4 # Uses the Git Auto-Commit Action to commit changes
       with:
-        name: resume
-        path: resume/jaman-uddin.pdf
+        commit_message: "Automatically update compiled resume PDF" # The commit message
+        file_pattern: resume/jaman-uddin.pdf # The path to the compiled PDF to commit
+        branch: main # The branch to commit to
+        commit_options: '--no-verify' # Additional git commit options
+        repository: . # The repository to commit to
+
+    # Optional Step 4: Create a Pull Request for the updated resume
+    # - name: Create Pull Request for updated resume
+    #   uses: peter-evans/create-pull-request@v3 # Uses the Create Pull Request Action
+    #   with:
+    #     commit-message: "Update compiled resume PDF" # The commit message for the PR branch
+    #     title: "Update Compiled Resume PDF" # The title of the Pull Request
+    #     body: "This pull request is auto-generated to update the compiled resume PDF." # The body of the Pull Request
+    #     branch: "update-compiled-resume-${{ github.run_number }}" # The name of the branch for the Pull Request
+    #     delete-branch: true # Deletes the branch after the Pull Request is merged
+    #     labels: "update,resume,automated-pr" # Labels to assign to the Pull Request
