@@ -37,7 +37,7 @@ jobs:
 
     # Step 3: Commit the compiled PDF back to the repository
     - name: Commit compiled PDF
-      uses: stefanzweifel/git-auto-commit-action@v4 # Uses the Git Auto-Commit Action to commit changes
+      uses: stefanzweifel/git-auto-commit-action@v5  # Uses the Git Auto-Commit Action to commit changes
       with:
         commit_message: "Automatically update compiled resume PDF" # The commit message
         file_pattern: resume/jaman-uddin.pdf # The path to the compiled PDF to commit
