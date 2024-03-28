@@ -42,6 +42,11 @@ jobs:
           pdftoppm resume/jaman-uddin.pdf resume/jaman-uddin -png -r 300
           mv resume/jaman-uddin-1.png resume/jaman-uddin.png
 
+    - name: Configure Git
+      run: |
+          git config --local user.email "zamaan.md19@gmail.com"
+          git config --local user.name "RootProgrammer"
+    
     # Create a new branch and commit changes
     - name: Create a new branch and commit PDF and PNG
       run: |
