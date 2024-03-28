@@ -48,13 +48,22 @@ jobs:
           git config --local user.email "zamaan.md19@gmail.com"
           git config --local user.name "RootProgrammer"
     
-    # Step 5: Create a new branch and commit changes
-    - name: Create a new branch and commit PDF and PNG
+    # Step 5: Update or Create Branch and Push Changes
+    - name: Update or Create Branch and Push Changes
       run: |
-        git checkout -b update-resume-$(date +%Y-%m-%d)
+        BRANCH_EXISTS=$(git ls-remote --heads https://github.com/RootProgrammer/Resume update-resume-$(date +%Y-%m-%d) | wc -l)
+        if [ $BRANCH_EXISTS -eq 0 ]; then
+          echo "Creating a new branch."
+          git checkout -b update-resume-$(date +%Y-%m-%d)
+        else
+          echo "Branch already exists. Checking out and pulling latest changes."
+          git checkout update-resume-$(date +%Y-%m-%d)
+          git pull origin update-resume-$(date +%Y-%m-%d)
+        fi
         git add resume/jaman-uddin.pdf resume/jaman-uddin.png
         git commit -m "Automatically update compiled resume PDF and PNG"
-        git push origin update-resume-$(date +%Y-%m-%d)
+        # Consider using --force-with-lease as a safer alternative to --force
+        git push --force-with-lease origin update-resume-$(date +%Y-%m-%d)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
