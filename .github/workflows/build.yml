@@ -18,10 +18,6 @@ jobs:
     - name: Set up Git repository
       uses: actions/checkout@v4
 
-    # Change to the resume directory before running the LaTeX action
-    # - name: Change to resume directory
-    #   run: cd resume
-
     # Step 2: Compile the LaTeX document to PDF
     - name: Install LaTeX
       run: |
@@ -34,7 +30,7 @@ jobs:
       run: |
           cd resume
           pdflatex jaman-uddin.tex
-    
+
     # Step 3: Convert the PDF to a high-quality image
     - name: Install Poppler (pdftoppm)
       run: |
@@ -44,14 +40,14 @@ jobs:
     - name: Convert PDF to PNG
       run: |
           pdftoppm resume/jaman-uddin.pdf resume/jaman-uddin -png -r 300
-          mv resume/jaman-uddin-1.png resume/jaman-uddin.png      
+          mv resume/jaman-uddin-1.png resume/jaman-uddin.png
 
-    # Step 3: Commit the compiled PDF back to the repository
-    - name: Commit compiled PDF and PNG
-      uses: stefanzweifel/git-auto-commit-action@v5  # Uses the Git Auto-Commit Action to commit changes
-      with:
-        commit_message: "Automatically update compiled resume PDF and PNG" # The commit message
-        file_pattern: resume/jaman-uddin.pdf resume/jaman-uddin.png # The path to the compiled PDF and generated PNG to commit
-        branch: main # The branch to commit to
+    # Create a new branch and commit changes
+    - name: Create a new branch and commit PDF and PNG
+      run: |
+        git checkout -b update-resume-$(date +%Y-%m-%d)
+        git add resume/jaman-uddin.pdf resume/jaman-uddin.png
+        git commit -m "Automatically update compiled resume PDF and PNG"
+        git push origin update-resume-$(date +%Y-%m-%d)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
