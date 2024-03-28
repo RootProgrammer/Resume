@@ -20,7 +20,7 @@ jobs:
 
     # Dynamically sets the branch name to include the current date and time for uniqueness
     - name: Set Dynamic Branch Name with Timestamp
-      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d_T%H_%M_%S)" >> $GITHUB_ENV
 
     # Installs the necessary LaTeX packages and the Poppler utility for converting PDFs to images
     - name: Install LaTeX and Dependencies
