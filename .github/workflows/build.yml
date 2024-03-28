@@ -18,8 +18,8 @@ jobs:
     - name: Set up Git repository
       uses: actions/checkout@v4
 
-    - name: Set Dynamic Branch Name
-      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d)" >> $GITHUB_ENV
+    - name: Set Dynamic Branch Name with Timestamp
+      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
 
     # Step 2: Compile the LaTeX document to PDF
     - name: Install LaTeX
