@@ -81,4 +81,5 @@ jobs:
         title: "Automatically update compiled resume PDF and PNG"
         body: "This is an auto-generated PR to update the compiled PDF and PNG files."
         branch: ${{ env.BRANCH_NAME }}
+        base: main # Specify the base branch for the PR
         
