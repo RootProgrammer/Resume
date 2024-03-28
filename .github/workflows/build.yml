@@ -1,62 +1,54 @@
 name: Compile and Update LaTeX Resume
 
-# Trigger the workflow on push events to the 'resume/**' directory, on a schedule, and manually through workflow_dispatch
+# Defines when the workflow should run
 on:
   push:
     paths:
-      - 'resume/**'
+      - 'resume/**' # Only triggers for changes in the 'resume' directory
   schedule:
     - cron: '0 19 * * 1' # Runs every Monday at 19:00 UTC
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   compile-and-deploy:
-    runs-on: ubuntu-latest # Specifies the runner environment
+    runs-on: ubuntu-latest # Specifies the runner environment to be the latest version of Ubuntu
 
     steps:
-    # Step 1: Checkout the repository
+    # Checkout the repository to access its contents
     - name: Set up Git repository
       uses: actions/checkout@v4
 
+    # Dynamically sets the branch name to include the current date and time for uniqueness
     - name: Set Dynamic Branch Name with Timestamp
       run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
 
-    # Step 2: Compile the LaTeX document to PDF
-    - name: Install LaTeX
+    # Installs the necessary LaTeX packages and the Poppler utility for converting PDFs to images
+    - name: Install LaTeX and Dependencies
       run: |
-          sudo apt-get update
-          sudo apt-get install -y aptitude
-          sudo aptitude update
-          sudo aptitude install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+        sudo apt-get update
+        sudo apt-get install -y aptitude
+        sudo aptitude update
+        sudo aptitude install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra poppler-utils
 
-    - name: Compile LaTeX document
+    # Compiles the LaTeX document into a PDF and converts the PDF to a PNG image
+    - name: Compile LaTeX document and Convert to PNG
       run: |
-          cd resume
-          pdflatex jaman-uddin.tex
+        cd resume
+        pdflatex jaman-uddin.tex # Compile LaTeX to PDF
+        pdftoppm jaman-uddin.pdf jaman-uddin -png -r 300 # Convert PDF to PNG
+        mv jaman-uddin-1.png jaman-uddin.png
 
-    # Step 3: Convert the PDF to a high-quality image
-    - name: Install Poppler (pdftoppm)
-      run: |
-          sudo aptitude update
-          sudo aptitude install -y poppler-utils
-
-    - name: Convert PDF to PNG
-      run: |
-          pdftoppm resume/jaman-uddin.pdf resume/jaman-uddin -png -r 300
-          mv resume/jaman-uddin-1.png resume/jaman-uddin.png
-
-    # Step 4: Configure Git user and email
+    # Configures Git with a user name and email to allow for commits
     - name: Configure Git
       run: |
-          git config --local user.email "zamaan.md19@gmail.com"
-          git config --local user.name "RootProgrammer"
+        git config --local user.email "zamaan.md19@gmail.com"
+        git config --local user.name "RootProgrammer"
     
-    # Step 5: Update or Create a Branch and Push Changes
+    # Checks if the branch exists, checks it out or creates it, then commits and pushes changes if there are any
     - name: Update or Create Branch and Push Changes
       run: |
-        # Fetch all branches from the remote to ensure git is aware of the branch if it exists
-        git fetch origin
-        # Attempt to checkout the branch if it exists, or create it if it doesn't
+        git fetch origin # Ensures we have the latest branch information
+        # Checkout the branch if it exists, or create a new one if it doesn't
         if git checkout ${{ env.BRANCH_NAME }}; then
           echo "Branch already exists. Checked out and pulling latest changes."
           git pull origin ${{ env.BRANCH_NAME }}
@@ -64,16 +56,23 @@ jobs:
           echo "Creating a new branch."
           git checkout -b ${{ env.BRANCH_NAME }}
         fi
-        # Add changes
-        git add resume/jaman-uddin.pdf resume/jaman-uddin.png
-        git commit -m "Automatically update compiled resume PDF and PNG"
-        # Push changes, using --force-with-lease as a safer alternative to --force
-        git push --force-with-lease origin ${{ env.BRANCH_NAME }}
+        git add resume/jaman-uddin.pdf resume/jaman-uddin.png # Stages changes
+        # Check if there are any changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes detected, not creating a commit."
+          echo "::set-output name=changes_detected::false" # Set output for next steps
+        else
+          git commit -m "Automatically update compiled resume PDF and PNG"
+          git push --force-with-lease origin ${{ env.BRANCH_NAME }}
+          echo "::set-output name=changes_detected::true"
+        fi
+      id: changes # This ID is used to reference output variables in subsequent steps
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Step 6: Create a Pull Request
+    # Creates a pull request with the changes if any changes were detected and committed
     - name: Create Pull Request
+      if: steps.changes.outputs.changes_detected == 'true' # Only runs if changes were detected
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -81,5 +80,4 @@ jobs:
         title: "Automatically update compiled resume PDF and PNG"
         body: "This is an auto-generated PR to update the compiled PDF and PNG files."
         branch: ${{ env.BRANCH_NAME }}
-        base: main # Specify the base branch for the PR
-        
+        base: main # Specifies the base branch for the PR to be merged into
