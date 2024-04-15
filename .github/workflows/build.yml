@@ -20,7 +20,7 @@ jobs:
 
     # Dynamically sets the branch name to include the current date and time for uniqueness
     - name: Set Dynamic Branch Name with Timestamp
-      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d_T%H_%M_%S)" >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=update-resume-$(date +%Y-%m-%d_time_%H_%M_%S)" >> $GITHUB_ENV
 
     # Installs the necessary LaTeX packages and the Poppler utility for converting PDFs to images
     - name: Install LaTeX and Dependencies
@@ -48,7 +48,6 @@ jobs:
     - name: Update or Create Branch and Push Changes
       run: |
         git fetch origin # Ensures we have the latest branch information
-        # Checkout the branch if it exists, or create a new one if it doesn't
         if git checkout ${{ env.BRANCH_NAME }}; then
           echo "Branch already exists. Checked out and pulling latest changes."
           git pull origin ${{ env.BRANCH_NAME }}
@@ -56,15 +55,13 @@ jobs:
           echo "Creating a new branch."
           git checkout -b ${{ env.BRANCH_NAME }}
         fi
-        git add resume/jaman-uddin.pdf resume/jaman-uddin.png # Stages changes
-        # Check if there are any changes to commit
+        git add resume/jaman-uddin.pdf resume/jaman-uddin.png
         if git diff --staged --quiet; then
           echo "No changes detected, not creating a commit."
-          echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
         else
           git commit -m "Automatically update compiled resume PDF and PNG"
           git push --force-with-lease origin ${{ env.BRANCH_NAME }}
-          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+        fi
       id: changes # This ID is used to reference output variables in subsequent steps
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
