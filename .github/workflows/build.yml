@@ -43,7 +43,7 @@ jobs:
       run: |
         git config --local user.email "zamaan.md19@gmail.com"
         git config --local user.name "RootProgrammer"
-    
+
     # Checks if the branch exists, checks it out or creates it, then commits and pushes changes if there are any
     - name: Update or Create Branch and Push Changes
       run: |
@@ -60,19 +60,18 @@ jobs:
         # Check if there are any changes to commit
         if git diff --staged --quiet; then
           echo "No changes detected, not creating a commit."
-          echo "::set-output name=changes_detected::false" # Set output for next steps
+          echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
         else
           git commit -m "Automatically update compiled resume PDF and PNG"
           git push --force-with-lease origin ${{ env.BRANCH_NAME }}
-          echo "::set-output name=changes_detected::true"
-        fi
+          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
       id: changes # This ID is used to reference output variables in subsequent steps
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # Creates a pull request with the changes if any changes were detected and committed
     - name: Create Pull Request
-      if: steps.changes.outputs.changes_detected == 'true' # Only runs if changes were detected
+      if: env.CHANGES_DETECTED == 'true' # Only runs if changes were detected
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
