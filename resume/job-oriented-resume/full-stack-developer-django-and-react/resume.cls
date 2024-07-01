@@ -12,9 +12,10 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\ProvidesClass{resume}[2010/07/10 v0.9 Resume class]
+\ProvidesClass{resume}[2024/06/29 v1.5 Resume class]
 
-\LoadClass[10pt,a4paper]{article} % Font size and paper type
+\LoadClass[10pt, a4paper]{article} % Font size and paper type; extarticle: for smaller font size; article: for normal font size
+
 
 \usepackage[parfill]{parskip} % Remove paragraph indentation
 \usepackage{array} % Required for boldface (\bf and \bfseries) tabular columns
@@ -46,14 +47,15 @@
 
 % \address command can be used to set the first, second, and third address (last 2 optional)
 \def \address #1{
-  \@ifundefined{@addresstwo}{
+  \ifx \@addressone \relax
+    \def \@addressone {#1}
+  \else
+  \ifx \@addresstwo \relax
     \def \@addresstwo {#1}
-  }{
-  \@ifundefined{@addressthree}{
-  \def \@addressthree {#1}
-  }{
-     \def \@addressone {#1}
-  }}
+  \else
+    \def \@addressthree {#1}
+  \fi
+  \fi
 }
 
 % \printaddress is used to style an address line (given as input)
