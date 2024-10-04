@@ -1,0 +1,5 @@
+sudo aptitude install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra poppler-utils
+
+pdflatex jaman-uddin.tex
+pdftoppm jaman-uddin.pdf jaman-uddin -png -r 300
+mv jaman-uddin-1.png jaman-uddin.png
